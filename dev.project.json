@@ -1,0 +1,24 @@
+{
+    "name": "BloodEngine",
+    "tree": {
+        "$className": "DataModel",
+
+        "ReplicatedStorage": {
+            "$className": "ReplicatedStorage",
+            "$ignoreUnknownInstances": true,
+
+            "Packages": {
+                "$className": "Folder",
+                "$path": "Packages",
+
+                "BloodEngine": {
+                    "$path": "src",
+
+                    "Assets": {
+                        "$path": "assets"
+                    }
+                }
+            }
+        }
+    }
+}

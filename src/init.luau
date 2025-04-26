@@ -1,3 +1,5 @@
+--!strict
+
 --[[
   @ Writer: @Smileeiles
   @ Version: v1.1.3
@@ -11,38 +13,34 @@
      This process can be customized to suit various needs and genres.
 ]]
 
--- Essential definitions
+--// Modules
 local Operator = require(script.Operator)
 local Settings = require(script.Settings)
 local Functions = require(script.Functions)
 
--- Globals
-local Unpack = table.unpack
+--// Types
+type ClassData = {
+	ActiveHandler: Settings.Class,
+	ActiveEngine: Operator.Class,
+}
+export type Settings = Settings.Settings
 
--- Class definition
-local BloodEngine = {}
-BloodEngine.__index = BloodEngine
+--// Class Setup
+local Class = {}
+Class.__index = Class
+export type Class = typeof(setmetatable({} :: ClassData, Class))
 
 --[[
   Class constructor, constructs the class
   including other properties/variables.
 ]]
-function BloodEngine.new(Data: Settings.Class)
-	local self = setmetatable({}, BloodEngine)
-	return self, self:Initialize(Data)
-end
+function Class.new(Data: Settings.Settings?)
+	local self = setmetatable({}, Class) :: Class
 
---[[
-  Immediately called after the construction of the class,
-  defines properties/variables for after-construction
-]]
-function BloodEngine:Initialize(Data: {})
-	Functions.MultiInsert(self, {
-		ActiveHandler = Settings.new(Data or {}),
-		ActiveEngine = function()
-			return Operator.new(self)
-		end,
-	})
+	self.ActiveHandler = Settings.new(Data or {} :: Settings.Settings)
+	self.ActiveEngine = Operator.new(self.ActiveHandler)
+
+	return self
 end
 
 --[[
@@ -53,7 +51,13 @@ end
   not to create a loop just for the
   purpose of emitting a few droplets.
 ]]
-function BloodEngine:EmitAmount(Origin: Vector3 | BasePart, Direction: Vector3, Amount: number, Data: Settings.Class?)
+function Class.EmitAmount(
+	self: Class,
+	Origin: Vector3 | BasePart,
+	Direction: Vector3,
+	Amount: number,
+	Data: Settings.Settings?
+)
 	-- Class definitions
 	local Handler: Settings.Class = self.ActiveHandler
 
@@ -62,7 +66,7 @@ function BloodEngine:EmitAmount(Origin: Vector3 | BasePart, Direction: Vector3, 
 
 	for _ = 1, Amount, 1 do
 		-- Define variables for later use
-		local DelayTime = Functions.NextNumber(Unpack(DropletDelay))
+		local DelayTime = Functions.NextNumber(DropletDelay)
 
 		-- Emit a droplet in the specified direction & origin
 		self:Emit(Origin, Direction, Data)
@@ -80,16 +84,17 @@ end
   This is useful when you want to control the emission
   loop externally.
 ]]
-function BloodEngine:Emit(Origin: Vector3 | BasePart, Direction: Vector3, Data: Settings.Class?)
-	-- Class definitions
-	local Engine: Operator.Class = self.ActiveEngine
-
-	-- Variable definitions
-	Origin = typeof(Origin) == "Instance" and Origin.Position or Origin
-	Direction = Direction or Functions.GetVector({ -10, 10 }) / 10
+function Class.Emit(self: Class, Origin: Vector3 | BasePart, Direction: Vector3, Data: Settings.Settings?)
+	-- Get pos
+	local Pos: Vector3
+	if typeof(Origin) == "Vector3" then
+		Pos = Origin
+	else
+		Pos = Origin.Position
+	end
 
 	-- Emit a single droplet
-	Engine:Emit(Origin, Direction, Data)
+	self.ActiveEngine:Emit(Pos, Direction, Data)
 end
 
 --[[
@@ -99,12 +104,8 @@ end
   Use this function when you want to access
   the settings for external handling of the system.
 ]]
-function BloodEngine:GetSettings(): Settings.Class
-	-- Class definitions
-	local Handler: Settings.Class = self.ActiveHandler
-
-	-- Export settings
-	return Handler
+function Class.GetSettings(self: Class): Settings.Class
+	return self.ActiveHandler
 end
 
 --[[
@@ -114,12 +115,8 @@ end
   It uses the `Handler:UpdateSettings()`, which
   uses the given `Data` array/table to update individual settings.
 ]]
-function BloodEngine:UpdateSettings(Data: Settings.Class)
-	-- Class definitions
-	local Handler: Settings.Class = self.ActiveHandler
-
-	-- Update the settings
-	Handler:UpdateSettings(Data)
+function Class.UpdateSettings(self: Class, Data: Settings.Settings)
+	self.ActiveHandler:UpdateSettings(Data)
 end
 
 --[[
@@ -129,23 +126,8 @@ end
 	Use this function when there is no longer a use
 	for the created engine. (Like when a character dies, etc.)
 ]]
-function BloodEngine:Destroy()
-	-- Class definitions
-	local Handler: Settings.Class = self.ActiveHandler
-	local Engine: Operator.Class = self.ActiveEngine
-
-	-- Destroy the handler & engine
-	self.Handler = nil
-	Engine:Destroy()
-	self.Engine = nil
-
-	-- Nullify/replace all the Engine methods
-	self.UpdateSettings = Functions.Replacement
-	self.GetSettings = Functions.Replacement
-
-	self.EmitAmount = Functions.Replacement
-	self.Emit = Functions.Replacement
+function Class.Destroy(self: Class)
+	self.ActiveEngine:Destroy()
 end
 
--- Exports the class
-return BloodEngine
+return Class.new

@@ -1,6 +1,10 @@
 {
-	"name": "Blood Engine",
-	"tree": {
-		"$path": "src"
-	}
+    "name": "Blood Engine",
+    "tree": {
+        "$path": "src",
+
+        "Assets": {
+            "$path": "assets"
+        }
+    }
 }

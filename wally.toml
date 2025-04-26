@@ -1,16 +1,23 @@
 [package]
-name = "rotntake/blood-engine"
-version = "0.1.3"
+name = "megamonsta2/blood-engine"
+version = "1.1.6"
 realm = "shared"
 registry = "https://github.com/upliftgames/wally-index"
 licence = "MIT"
 authors = ["rotntake"]
 
-description = "A droplet emitter system."
+description = "A droplet emitter system. This is a fork of rotntake's (AKA Smileeiles) blood engine, with proper typing and usage of wally packages, instead of having them embedded within the module."
 
 exclude = ["**"]
-include = ["src", "src/*", "default.project.json", "wally.toml"]
-
-[dev-dependencies]
+include = [
+    "src",
+    "src/*",
+    "assets",
+    "assets/*",
+    "default.project.json",
+    "wally.toml",
+]
 
 [dependencies]
+PartCache = "andremhpra/partcache@1.0.0"
+FastCast = "megamonsta2/fastcastredux@13.2.7"
