@@ -54,7 +54,7 @@ end
 function Class.EmitAmount(
 	self: Class,
 	Origin: Vector3 | BasePart,
-	Direction: Vector3,
+	Direction: Vector3?,
 	Amount: number,
 	Data: Settings.Settings?
 )
@@ -84,7 +84,7 @@ end
   This is useful when you want to control the emission
   loop externally.
 ]]
-function Class.Emit(self: Class, Origin: Vector3 | BasePart, Direction: Vector3, Data: Settings.Settings?)
+function Class.Emit(self: Class, Origin: Vector3 | BasePart, Direction: Vector3?, Data: Settings.Settings?)
 	-- Get pos
 	local Pos: Vector3
 	if typeof(Origin) == "Vector3" then
@@ -94,7 +94,7 @@ function Class.Emit(self: Class, Origin: Vector3 | BasePart, Direction: Vector3,
 	end
 
 	-- Emit a single droplet
-	self.ActiveEngine:Emit(Pos, Direction, Data)
+	self.ActiveEngine:Emit(Pos, Direction or Functions.GetVector(NumberRange.new(-10, 10)) / 10, Data)
 end
 
 --[[
