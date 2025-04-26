@@ -55,14 +55,15 @@ export type Class = typeof(setmetatable({} :: ClassData, Class))
   Class constructor, constructs the class
   including other properties/variables.
 ]]
-function Class.new(SettingsInstance: Settings.Class): Class
+function Class.new(SettingsInstance: Settings.Class)
 	local self = setmetatable({}, Class) :: Class
 
 	self.Settings = SettingsInstance
 
 	self:Initialize()
+	self:InitializeCast()
 
-	return self, self:InitializeCast()
+	return self
 end
 
 --[[
@@ -86,6 +87,7 @@ function Class.Initialize(self: Class)
 	self.Droplet = Object
 	self.Cache = Cache
 	self.Container = Folder
+	self.Caster = FastCast.new()
 	self.Behavior = Functions.SetupBehavior(Cache, CastParams)
 end
 
