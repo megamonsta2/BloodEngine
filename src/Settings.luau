@@ -9,7 +9,7 @@
 --// Types
 type ClassData = {
 	FolderName: string, -- Specifies the name of the folder containing the droplets.
-	Type: "Default" | "Decal", -- Defines the droplet type. It can be either "Default" (Sphere) or "Decal".
+	Type: "Default" | "Decal" | "Brick", -- Defines the droplet type. It can be either "Default" (Sphere), "Decal" or "Brick".
 	Limit: number, -- Sets the maximum number of droplets that can be created.
 	Filter: { Instance }, -- An array/table of instances that should be ignored during droplet collision.
 
@@ -117,7 +117,9 @@ function Class.new(Data: ClassData)
 		self[Setting] = Value
 	end
 
-	return self, self:CreateParams()
+	self:CreateParams()
+
+	return self
 end
 
 --[[

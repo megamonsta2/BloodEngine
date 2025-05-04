@@ -8,8 +8,9 @@
 ]]
 
 --// Modules
-local PartCache = require(script.Parent.Parent.PartCache)
-local FastCast = require(script.Parent.Parent.FastCast)
+local LIB_FOLDER = script.Parent.Parent
+local PartCache = require(LIB_FOLDER.PartCache)
+local FastCast = require(LIB_FOLDER.FastCast)
 
 local Functions = require(script.Parent.Functions)
 local Settings = require(script.Parent.Settings)
@@ -19,12 +20,12 @@ type ClassData = {
 	Settings: Settings.Class,
 
 	Registry: { [BasePart]: Settings.Class },
-	Connections: { RBXScriptConnection },
+	Connections: { FastCast.ConnectionStatic },
 
 	Droplet: BasePart,
-	Cache: PartCache.PartCache,
+	Cache: PartCache.Class,
 	Container: Folder,
-	Caster: FastCast.Caster,
+	Caster: FastCast.Class,
 	Behavior: FastCast.FastCastBehavior,
 }
 
@@ -39,7 +40,7 @@ local Meshes = Assets.Meshes
 local MeshMap = {
 	Default = Meshes.Droplet,
 	Decal = Meshes.Decal,
-}
+} :: { [string]: MeshPart }
 
 -- Sounds
 local Sounds = Assets.Sounds
@@ -105,8 +106,8 @@ function Class.InitializeCast(self: Class)
 	local Container = self.Container
 
 	-- Event definitions
-	local LengthChanged = Caster.LengthChanged
-	local RayHit = Caster.RayHit
+	local LengthChanged = Caster.Events.LengthChanged
+	local RayHit = Caster.Events.RayHit
 
 	-- Caster Listeners
 	Functions.Connect(
@@ -200,7 +201,6 @@ end
 function Class.Destroy(self: Class)
 	-- Destroy classes
 	self.Cache:Dispose()
-	table.clear(self.Caster)
 	Functions.DisconnectAll(self.Connections)
 
 	-- Destroy main container
@@ -228,7 +228,15 @@ function Class.Emit(self: Class, Origin: Vector3, Direction: Vector3, InputData:
 
 	-- Cache needs parts
 	if #self.Cache.Open <= 0 then
-		return
+		-- Return existing droplets
+
+		-- At limit, end
+		if #self.Cache.InUse >= self.Settings.Limit then
+			return
+		end
+
+		-- Create more parts
+		self.Cache:Expand()
 	end
 
 	-- Caster definitions, fire the caster with given arguments
@@ -239,7 +247,9 @@ function Class.Emit(self: Class, Origin: Vector3, Direction: Vector3, InputData:
 	end
 
 	-- Update the mesh's look and color
-	Droplet:ApplyMesh(MeshMap[Data.Type])
+	if MeshMap[Data.Type] then
+		Droplet:ApplyMesh(MeshMap[Data.Type])
+	end
 	Droplet.Color = Data.DropletColor
 
 	-- Assign the registry entry and update the attributes
@@ -283,8 +293,6 @@ end
   it landed on a surface.
 ]]
 function Class.HandleDroplet(self: Class, Object: BasePart, Data: Settings.Class)
-	-- Object definitions
-
 	-- Variable definitions
 	local Tweens = Data.Tweens
 	local DecayDelay = Data.DecayDelay
@@ -401,6 +409,32 @@ function Class.Expanse(
 	self:ReturnDroplet(Object)
 end
 
+function Class.Shrink(self: Class, Object: BasePart, Data: Settings.Class)
+	-- Variable definitions
+	local ScaleDown = Data.ScaleDown
+	local FinalSize = ScaleDown and Vector3.new(0.01, 0.01, 0.01) or Object.Size
+
+	-- Tween definitions
+	local DecayTween = Functions.CreateTween(Object, Data.Tweens.Decay, { Transparency = 1, Size = FinalSize })
+
+	-- Update Droplet properties
+	local Trail = Object:FindFirstChildOfClass("Trail")
+	if Trail then
+		Trail.Enabled = false
+	end
+
+	-- Listeners
+	DecayTween.Completed:Connect(function()
+		DecayTween:Destroy()
+		Object:SetAttribute("Decaying", nil)
+		self:ReturnDroplet(Object)
+	end)
+
+	-- Reset the droplet after the given DecayDelay has passed
+	DecayTween:Play()
+	Object:SetAttribute("Decaying", true)
+end
+
 --[[
   Resets the given droplet/pool,
   then returns it to the Cache.
@@ -408,7 +442,7 @@ end
 function Class.ReturnDroplet(self: Class, Object: BasePart)
 	-- Execute essential functions
 	Functions.ResetDroplet(Object, self.Droplet)
-	self.Cache:ReturnPart(Object) -- Ignore, ReturnPart exists
+	self.Cache:ReturnPart(Object)
 end
 
 return Class

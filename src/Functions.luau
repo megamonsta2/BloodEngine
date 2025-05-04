@@ -1,16 +1,14 @@
---!strict
-
 --[[
-  @Description: Contains a list of useful System.
+  @Description: Contains a list of useful functions.
 ]]
 
 --// Services
 local TweenService = game:GetService("TweenService")
-local Workspace = game:GetService("Workspace")
 
---// Packages
-local PartCache = require(script.Parent.Parent.PartCache)
-local FastCast = require(script.Parent.Parent.FastCast)
+--// Modules
+local LIB_FOLDER = script.Parent.Parent
+local PartCache = require(LIB_FOLDER.PartCache)
+local FastCast = require(LIB_FOLDER.FastCast)
 
 --// Variables
 local Random = Random.new()
@@ -66,12 +64,12 @@ end
   Sets up a `CastBehavior` for later use,
   then returns it.
 ]]
-function System.SetupBehavior(Cache: PartCache.PartCache, CastParams: RaycastParams): FastCast.FastCastBehavior
+function System.SetupBehavior(Cache: PartCache.Class, CastParams: RaycastParams): FastCast.FastCastBehavior
 	-- Define Variables
 	local Behavior = FastCast.newBehavior()
 
 	-- Update Behavior properties
-	Behavior.Acceleration = Vector3.new(0, -Workspace.Gravity, 0)
+	Behavior.Acceleration = Vector3.new(0, -workspace.Gravity, 0)
 	Behavior.MaxDistance = 500
 	Behavior.RaycastParams = CastParams
 	Behavior.CosmeticBulletProvider = Cache
@@ -83,7 +81,7 @@ end
 --[[
 	Clones and parents Droplet effects from a template part.
 ]]
-function System.CreateEffects(Parent: MeshPart, ImpactName: string)
+function System.CreateEffects(Parent: BasePart, ImpactName: string)
 	-- Variable definitions
 	local Trail = TrailEffects:Clone()
 
@@ -143,7 +141,7 @@ end
 ]]
 function System.GetFolder(Name: string): Folder
 	-- Variable definitons
-	local Terrain = Workspace.Terrain
+	local Terrain = workspace.Terrain
 	local DropletsFolder = (Terrain:FindFirstChild(Name) or Instance.new("Folder"))
 	if not DropletsFolder:IsA("Folder") then
 		error(`${DropletsFolder} is not a folder!`)
@@ -259,28 +257,27 @@ end
 ]]
 function System.EmitParticles(Attachment: Attachment, Amount: number)
 	for _, Particle in Attachment:GetChildren() do
-		if not Particle:IsA("ParticleEmitter") then
-			continue
+		if Particle:IsA("ParticleEmitter") then
+			Particle:Emit(Amount)
 		end
-
-		Particle:Emit(Amount)
 	end
 end
 
 --[[
 	Returns the closest part within a given distance.
 ]]
-function System.GetClosest(Origin: BasePart, Magnitude: number, Ancestor): BasePart
+function System.GetClosest(Origin: BasePart, Magnitude: number, Ancestor: Instance): BasePart
 	-- Variable definitions
-	local Children = Ancestor:GetChildren()
 	local ClosestPart = nil
 	local MinimumDistance = math.huge
 
-	for _, Part: BasePart in Children do
+	for _, Part in Ancestor:GetChildren() do
+		if not Part:IsA("BasePart") then
+			continue
+		end
+
 		local Distance = (Origin.Position - Part.Position).Magnitude
-
 		local Logic = (not Part.Anchored and Origin ~= Part and Distance < Magnitude and Distance < MinimumDistance)
-
 		if not Logic then
 			continue
 		end
@@ -358,7 +355,7 @@ end
 --[[
 	Adds a connection to a table that holds connections.
 ]]
-function System.Connect(Connection: RBXScriptConnection, Holder: { RBXScriptConnection })
+function System.Connect(Connection: FastCast.ConnectionStatic, Holder: { FastCast.ConnectionStatic })
 	-- Update table
 	table.insert(Holder, Connection)
 end
@@ -367,9 +364,9 @@ end
 	Destroys and disconnects all the connections 
 	in a table that holds connections.
 ]]
-function System.DisconnectAll(Holder: { RBXScriptConnection })
+function System.DisconnectAll(Holder: { FastCast.ConnectionStatic })
 	-- Disconnect and destroy connections in Holder
-	for Index, Connection: RBXScriptConnection in Holder do
+	for Index, Connection: FastCast.ConnectionStatic in Holder do
 		Connection:Disconnect()
 		Holder[Index] = nil
 	end

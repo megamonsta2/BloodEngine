@@ -1,5 +1,5 @@
 {
-    "name": "BloodEngine",
+    "name": "blood-engine",
     "tree": {
         "$className": "DataModel",
 
