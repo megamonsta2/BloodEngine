@@ -8,11 +8,11 @@
 
 <div align="center">
 
-v1.1.2 • [Model](https://create.roblox.com/marketplace/asset/15420466379/) • [Devforum](https://devforum.roblox.com/t/blood-engine-a-droplet-emitter-system/2545682)
+v2.0.3 • [Original Devforum](https://devforum.roblox.com/t/blood-engine-a-droplet-emitter-system/2545682)
 
 </div>
 
-This is a fork of rotntake's blood-engine with strict typechecking and usage of wally for packages (PartCache and FastCast)
+This is a fork of rotntake's blood-engine with strict typechecking and usage of wally for packages (PartCache and FastCast).
 
 ## What is Blood Engine?
 
