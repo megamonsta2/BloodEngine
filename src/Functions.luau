@@ -25,42 +25,6 @@ local ImpactEffects = Effects.Impact
 local System = {}
 
 --[[
-  A shorter way of doing:
-  ```lua
-    typeof(Variable) == "Type"
-  ```
-]]
-function System.IsOfType(Any: any, Type: string)
-	return typeof(Any) == Type
-end
-
---[[
-  Allows the ability to insert an array of
-   variables efficently onto a table.
-]]
-function System.MultiInsert(List: { [string]: any } | { any }, Variables: { [string | number]: any | () -> any })
-	for Key, Variable in Variables do
-		local Value: any
-
-		-- Executes the variable if it's a function,
-		--  It is expected to return a variable to later assign.
-		if typeof(Variable) == "function" then
-			Value = (Variable :: () -> any)()
-		else
-			Value = Variable
-		end
-
-		-- Adds in the variable with a key
-		if typeof(Key) == "string" then
-			(List :: { [string]: any })[Key] = Value
-		else
-			-- Adds in the variable without a key
-			table.insert(List :: { any }, Value)
-		end
-	end
-end
-
---[[
   Sets up a `CastBehavior` for later use,
   then returns it.
 ]]
@@ -370,14 +334,6 @@ function System.DisconnectAll(Holder: { FastCast.ConnectionStatic })
 		Connection:Disconnect()
 		Holder[Index] = nil
 	end
-end
-
---[[
-	Basic function used to replace the initial module methods,
-	therefore avoiding errors after deletion of the module.
-]]
-function System.Replacement()
-	warn("BLOOD-ENGINE - Attempt to call a deleted function.")
 end
 
 return System
