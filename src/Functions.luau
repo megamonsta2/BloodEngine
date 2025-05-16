@@ -100,26 +100,6 @@ function System.GetDroplet(ImpactName: string): BasePart
 end
 
 --[[
-  Returns a folder that handles droplets; If it doesn't exist,
-  make a new one in Workspace.Terrain.
-]]
-function System.GetFolder(Name: string): Folder
-	-- Variable definitons
-	local Terrain = workspace.Terrain
-	local DropletsFolder = (Terrain:FindFirstChild(Name) or Instance.new("Folder"))
-	if not DropletsFolder:IsA("Folder") then
-		error(`${DropletsFolder} is not a folder!`)
-	end
-
-	-- Update properties
-	DropletsFolder.Name = Name
-	DropletsFolder.Parent = Terrain
-
-	-- Export folder
-	return DropletsFolder
-end
-
---[[
   Returns a Vector3, given the array range.
 ]]
 function System.GetVector(Range: NumberRange)

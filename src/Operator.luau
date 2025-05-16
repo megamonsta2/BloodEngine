@@ -76,7 +76,7 @@ function Class.Initialize(self: Class)
 	local Limit = self.Settings.Limit
 	local CastParams = self.Settings.RaycastParams
 
-	local Folder = Functions.GetFolder(FolderName)
+	local Folder = PartCache.CreateSubFolder(FolderName)
 	local Object = Functions.GetDroplet(self.Settings.SplashName)
 
 	-- Class definitions
