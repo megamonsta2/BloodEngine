@@ -2,7 +2,7 @@
 name = "megamonsta2/blood-engine"
 description = "A droplet emitter system. This is a fork of rotntake's (AKA Smileeiles) blood engine, with proper typing and usage of wally packages for FastCast and PartCache, instead of having them embedded within the module."
 registry = "https://github.com/upliftgames/wally-index"
-version = "2.1.0"
+version = "2.1.1"
 realm = "shared"
 licence = "MIT"
 authors = ["rotntake", "megamonsta2"]
