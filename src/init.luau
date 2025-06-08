@@ -70,12 +70,15 @@ end
 	This is useful when you want to control the emission
 	loop externally.
 ]]
-function Class:Emit(Origin: Vector3 | BasePart, Direction: Vector3?, Data: Settings?)
+function Class:Emit(Origin: Vector3 | BasePart?, Direction: Vector3?, Data: Settings?)
 	-- Get pos
 	local Pos: Vector3
-	if typeof(Origin) == "Vector3" then
+	if not Origin then
+		-- Must exist
+		return
+	elseif typeof(Origin) == "Vector3" then
 		Pos = Origin
-	else
+	elseif Origin:IsA("BasePart") and Origin.Parent then
 		Pos = Origin.Position
 	end
 
